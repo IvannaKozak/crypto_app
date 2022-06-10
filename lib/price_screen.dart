@@ -36,43 +36,27 @@ class _PriceScreenState extends State<PriceScreen> {
     }
   }
 
-  // DropdownButton<String> androidDropdown() {
-  //   List<DropdownMenuItem<String>> dropdownItems = [];
-  //   for (String currency in currenciesList) {
-  //     var newItem = DropdownMenuItem(
-  //       child: Text(currency),
-  //       value: currency,
-  //     );
-  //     dropdownItems.add(newItem);
-  //   }
-  //   return DropdownButton<String>(
-  //             value: selectedCurrency,
-  //             items: dropdownItems, 
-  //             onChanged: (value) {
-  //               setState(() {
-  //                 selectedCurrency = value;
-  //                 getCurrenciesData();
-  //                 print(selectedCurrency);
-  //               },
-  //               );
-  //             },
-  //           );
-  //   }
-  
-  List<DropdownMenuItem> dropDown() {
-    List<DropdownMenuItem<String>> dropDownItems = [];
-
+  DropdownButton<String> androidDropdown() {
+    List<DropdownMenuItem<String>> dropdownItems = [];
     for (String currency in currenciesList) {
-      //for every currency in the list we create a new dropdownmenu item
       var newItem = DropdownMenuItem(
         child: Text(currency),
         value: currency,
       );
-      // add to the list of menu item
-      dropDownItems.add(newItem);
+      dropdownItems.add(newItem);
     }
-    return dropDownItems;
-  }
+    return DropdownButton<String>(
+              value: selectedCurrency,
+              items: dropdownItems, 
+              onChanged: (value) {
+                setState(() {
+                  selectedCurrency = value;
+                  getCurrenciesData();
+                },
+                );
+              },
+      );
+    }
 
   CupertinoPicker iOSPicker() {
     List<Text> pickerItems = [];
@@ -85,15 +69,30 @@ class _PriceScreenState extends State<PriceScreen> {
       onSelectedItemChanged: (selectedIndex) {
         setState(() {
           selectedCurrency = currenciesList[selectedIndex];
-          print(selectedCurrency);
+          getCurrenciesData();
         });
       },
       children: pickerItems,
     );
   }
 
+  Column makeCards() {
+    List<CardButton> cryptoCards = [];
+    for (String crypto in cryptoList) {
+      cryptoCards.add(
+        CardButton(
+          cryptoCurrency: crypto,
+          selectedCurrency: selectedCurrency,
+          value: isWaiting ? '?' : coinValues[crypto],
+        ),
+      );
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: cryptoCards,
+    );
+  }
   
-
 
   @override
   Widget build(BuildContext context) {
@@ -106,18 +105,19 @@ class _PriceScreenState extends State<PriceScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          CardButton(cryptoCurrency: 'BTC',
-                  selectedCurrency: selectedCurrency,
-                  /// this is a ternary opertor, it checks if is waiting is true, it displays a ? but if its false
-                  /// meaning all operations are done  it prints the value of BTC(key) in the coinValues map.
-                  value: isWaiting ? '?' : coinValues['BTC'],),
-          CardButton(cryptoCurrency: 'ETH',
-                  selectedCurrency: selectedCurrency,
+          makeCards(),
+          // CardButton(cryptoCurrency: 'BTC',
+          //         selectedCurrency: selectedCurrency,
+          //         /// this is a ternary opertor, it checks if is waiting is true, it displays a ? but if its false
+          //         /// meaning all operations are done  it prints the value of BTC(key) in the coinValues map.
+          //         value: isWaiting ? '?' : coinValues['BTC'],),
+          // CardButton(cryptoCurrency: 'ETH',
+          //         selectedCurrency: selectedCurrency,
                   
-                  value: isWaiting ? '?' : coinValues['ETH'],),
-          CardButton(cryptoCurrency: 'LTC',
-                  selectedCurrency: selectedCurrency,
-                  value: isWaiting ? '?' : coinValues['LTC'],),
+          //         value: isWaiting ? '?' : coinValues['ETH'],),
+          // CardButton(cryptoCurrency: 'LTC',
+          //         selectedCurrency: selectedCurrency,
+          //         value: isWaiting ? '?' : coinValues['LTC'],),
           // Padding(
           //   padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
           //   child: Card(
@@ -144,18 +144,7 @@ class _PriceScreenState extends State<PriceScreen> {
             alignment: Alignment.center,
             padding: EdgeInsets.only(bottom: 30.0),
             color: Colors.lightBlue,
-            child: DropdownButton<String>(
-              dropdownColor: Colors.lightBlue,
-              value: selectedCurrency,
-              items: dropDown(),
-              onChanged: (value) {
-                setState(() {
-                  selectedCurrency = value;
-                  /// call this function each time the value in the drop down changes.
-                  getCurrenciesData();
-                });
-              },
-            ),//Platform.isIOS ? iOSPicker() : androidDropdown(),
+            child: iOSPicker(), // Platform.isIOS ? iOSPicker() : androidDropdown(),//Platform.isIOS ? iOSPicker() : androidDropdown(),
           ),
         ],
       ),
